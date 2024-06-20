@@ -3,7 +3,7 @@ import * as mathjs from 'mathjs';
 import {useQuery} from "@tanstack/react-query";
 import axios from "axios";
 
-//Styles
+// Styles
 import './input-formula.component.scss';
 
 // Store
@@ -22,16 +22,9 @@ export const FormulaInputFormulaComponent: FC<TFormulaInputFormulaProps> = ({onR
 
     const [autocompleteView, setAutocompleteView] = useState<boolean>(false);
 
-    // const filteredAutocompleteOptions = useMemo(() => {
-    //   const childNodes = Array.from(inputFormulaRef.current?.childNodes || []);
-    //   const lastText = childNodes[childNodes.length]?.nodeValue || '';
-    //   return AUTOCOMPLETE_OPTIONS.filter(({ name, category }) => name.includes(lastText) || category.includes(lastText));
-    // }, [inputFormulaRef.current?.innerHTML]);
-
-    //const filteredAutocompleteOptions = useMemo(() => AUTOCOMPLETE_OPTIONS, [inputFormulaRef.current?.innerHTML]);
-
     const autocompleteStore = useAutocompleteStore();
 
+    // Function to fetch autocomplete options from an API endpoint
     const fetchAutocompleteOptions = async (): Promise<IAutocompleteOption[]> => {
         try {
             const response = await axios.get<IAutocompleteOption[]>('https://652f91320b8d8ddac0b2b62b.mockapi.io/autocomplete');
@@ -42,18 +35,20 @@ export const FormulaInputFormulaComponent: FC<TFormulaInputFormulaProps> = ({onR
         }
     };
 
+    // UseQuery hook to fetch and manage autocomplete options using React Query
     const {data: autocompleteOptions} = useQuery({
         queryKey: ['autocompleteOptions'],
         queryFn: fetchAutocompleteOptions,
     });
 
+    // Effect hook to update the autocomplete options in the custom store
     useEffect(() => {
         if (autocompleteOptions && Array.isArray(autocompleteOptions)) {
             autocompleteStore.setAutocompleteOptions(autocompleteOptions);
         }
     }, [autocompleteOptions]);
 
-
+    // Function to handle keyboard events and filter input
     const onValueChange = (event: KeyboardEvent<HTMLDivElement>) => {
         const allowedKeys = new RegExp('[0-9*+\\-^()\\.\\/]');
 
@@ -69,6 +64,7 @@ export const FormulaInputFormulaComponent: FC<TFormulaInputFormulaProps> = ({onR
         event.preventDefault();
     }
 
+    // Function to create a tag with an input element based on an autocomplete option
     const createTagWithInput = (option: IAutocompleteOption): HTMLSpanElement => {
         const formulaTag = document.createElement('span');
         formulaTag.innerHTML = option.name;
@@ -83,6 +79,7 @@ export const FormulaInputFormulaComponent: FC<TFormulaInputFormulaProps> = ({onR
         return formulaTag;
     }
 
+    // Function to handle selection of an autocomplete option
     const onSelectAutocompleteOption = (option: IAutocompleteOption): void => {
         if (!inputFormulaRef.current) return;
 
@@ -92,11 +89,13 @@ export const FormulaInputFormulaComponent: FC<TFormulaInputFormulaProps> = ({onR
         inputFormulaRef.current.append(formulaTag);
     }
 
+    // Function to handle click outside of the autocomplete view
     const handleClickOutside = (event: MouseEvent): void => {
         if (!wrapperRef.current || wrapperRef.current.contains(event.target as Node)) return;
         setAutocompleteView(false);
     }
 
+    // Function to calculate the result based on the input formula
     const calculateResult = (): void => {
         const operands = Array.from(inputFormulaRef?.current?.childNodes || []).map(node => {
             if (node.nodeName === '#text') {
@@ -114,6 +113,7 @@ export const FormulaInputFormulaComponent: FC<TFormulaInputFormulaProps> = ({onR
         }
     }
 
+    // Effect hook to add and remove event listener for click outside event
     useEffect(() => {
         // Bind the event listener
         document.addEventListener("mousedown", handleClickOutside);
@@ -136,7 +136,7 @@ export const FormulaInputFormulaComponent: FC<TFormulaInputFormulaProps> = ({onR
         <div hidden={!autocompleteView} className="input-formula--autocomplete">
             {autocompleteOptions?.map((option, idx) => (
                 <div className="autocomplete-option" key={idx}
-                     onClick={() => onSelectAutocompleteOption(option)}>{option.category}: {option.name}</div>))}
+                     onClick={() => onSelectAutocompleteOption(option)}>{option.name}</div>))}
         </div>
     </div>)
 }
