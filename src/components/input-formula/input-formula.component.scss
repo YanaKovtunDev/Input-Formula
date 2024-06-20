@@ -1,0 +1,66 @@
+.input-formula {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  &--field {
+    position: relative;
+    border: 2px solid black;
+    padding: 10px 12px;
+    border-radius: 6px;
+    width: 100%;
+    outline: none;
+    max-height: 300px;
+    overflow: hidden;
+    overflow-y: auto;
+    transition: all 0.3s ease;
+
+    .field-option {
+      background-color: lightsteelblue;
+      border-radius: 6px;
+      padding: 4px 6px;
+
+      input {
+        display: inline-flex;
+        max-width: 30px;
+        outline: none;
+      }
+    }
+
+    &:empty::before {
+      position: absolute;
+      left: 12px;
+      top: 10px;
+      content: attr(data-placeholder);
+      color: grey;
+    }
+
+    &:focus {
+      border-color: lightskyblue;
+    }
+  }
+
+  &--autocomplete {
+    position: absolute;
+    top: 110%;
+    border: 2px solid black;
+    border-radius: 6px;
+    width: 100%;
+    outline: none;
+    max-height: 300px;
+    overflow: hidden;
+    overflow-y: auto;
+    transition: all 0.3s ease;
+    background-color: white;
+
+    .autocomplete-option {
+      padding: 4px 6px;
+
+      &:hover {
+        background-color: lightgray;
+        cursor: pointer;
+      }
+    }
+  }
+}
